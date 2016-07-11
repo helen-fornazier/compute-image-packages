@@ -49,6 +49,7 @@ function build_distro() {
 }
 
 # RHEL/CentOS
+build_distro 'el5' 'rpm' '/usr/local/lib/python2.7/site-packages'
 build_distro 'el6' 'rpm' '/usr/lib/python2.6/site-packages'
 build_distro 'el7' 'rpm' '/usr/lib/python2.7/site-packages'
 
