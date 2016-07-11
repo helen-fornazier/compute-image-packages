@@ -21,7 +21,7 @@ function build_distro() {
   declare -r init_config="$3"
   declare -r init_prefix="$4"
   declare depends='google-compute-engine'
-  declare file_pattern='*[^.sh]'
+  declare file_pattern='*[^.s][^.h]'
   declare init_files=(${init_config}/${file_pattern})
   declare name='google-compute-engine-init'
 
