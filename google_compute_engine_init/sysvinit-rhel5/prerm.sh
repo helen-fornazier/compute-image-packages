@@ -14,10 +14,10 @@
 # limitations under the License.
 
 if [ "$1" = purge ]; then
-  update-rc.d google-accounts-daemon remove
-  update-rc.d google-clock-skew-daemon remove
-  update-rc.d google-instance-setup remove
-  update-rc.d google-ip-forwarding-daemon remove
-  update-rc.d google-shutdown-scripts defaults
-  update-rc.d google-startup-scripts defaults
+  chkconfig --del google-accounts-daemon
+  chkconfig --del google-clock-skew-daemon
+  chkconfig --del google-instance-setup
+  chkconfig --del google-ip-forwarding-daemon
+  chkconfig --del google-shutdown-scripts
+  chkconfig --del google-startup-scripts
 fi
