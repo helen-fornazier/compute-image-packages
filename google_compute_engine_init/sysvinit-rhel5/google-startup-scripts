@@ -26,8 +26,8 @@
 NAME=google-startup-scripts
 SCRIPTNAME=/etc/init.d/$NAME
 
-# Load the rcS variables.
-. /lib/init/vars.sh
+# source function library
+. /etc/init.d/functions
 
 #
 # Function that starts the daemon/service.
