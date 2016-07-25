@@ -17,7 +17,7 @@
 # Provides:          google_shutdown_scripts
 # Required-Start:
 # Required-Stop:     $remote_fs $syslog docker kubelet
-# Default-Start:
+# Default-Start:     1 2 3 4 5
 # Default-Stop:      0 6
 # Short-Description: Google Compute Engine Shutdown Scripts
 # Description:       Runs user specified shutdown scripts from metadata.
@@ -38,8 +38,13 @@ do_stop()
 }
 
 case "$1" in
+  start)
+    # Necessary to allow stop to be called on shutdown
+    touch /var/lock/subsys/$NAME
+    ;;
   stop)
     do_stop
+    rm /var/lock/subsys/$NAME
     ;;
   *)
     echo "Usage: $SCRIPTNAME stop" >&2
