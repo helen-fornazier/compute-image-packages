@@ -45,6 +45,9 @@ do_start()
   echo -n $"Starting $NAME:"
   daemon --pidfile $PIDFILE "$DAEMON &"
   touch $PIDFILE
+  # workaround: when the system boots sometime the pid is not
+  # ready righ away, wait a little
+  usleep 100000
   PID="$(__pids_pidof "$DAEMON")"
   #echo "Saving PID" $PID " to " $PIDFILE
   if [ ! -z "$PID" ]; then
