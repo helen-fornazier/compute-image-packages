@@ -46,7 +46,7 @@ do_start()
   touch $PIDFILE
   PID="$(__pids_pidof "$DAEMON")"
   #echo "Saving PID" $PID " to " $PIDFILE
-  if [ $PID ]; then
+  if [ ! -z "$PID" ]; then
       echo $PID > $PIDFILE
   fi
   echo ""
