@@ -43,11 +43,6 @@ setuptools.setup(
             'google_metadata_script_runner=google_compute_engine.metadata_scripts.script_manager:main',
         ],
     },
-    options={
-        'build_scripts': {
-            'executable': '/usr/bin/python26',
-        },
-    },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: No Input/Output (Daemon)',
