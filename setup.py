@@ -45,7 +45,7 @@ setuptools.setup(
     },
     options={
         'build_scripts': {
-            'executable': '/usr/local/bin/python',
+            'executable': '/usr/bin/python26',
         },
     },
     classifiers=[
