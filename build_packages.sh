@@ -35,8 +35,8 @@ function build_distro() {
     -s python \
     -t "${pkg_type}" \
     --depends "${depends}" \
-    --depends 'python-boto' \
-    --depends 'python-setuptools' \
+    --depends 'python26-boto' \
+    --depends 'python26-setuptools' \
     --iteration "0.${TIMESTAMP}" \
     --maintainer 'gc-team@google.com' \
     --name "${name}" \
