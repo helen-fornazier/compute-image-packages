@@ -14,7 +14,7 @@
 #     limitations under the License.
 #
 ### BEGIN INIT INFO
-# Provides:          google_ip_forwarding_daemon
+# Provides:          $google_ip_forwarding_daemon
 # Required-Start:    $network $syslog $google_instance_setup
 # Required-Stop:     $network
 # Default-Start:     2 3 4 5

@@ -14,7 +14,7 @@
 #     limitations under the License.
 #
 ### BEGIN INIT INFO
-# Provides:          google_clock_skew_daemon
+# Provides:          $google_clock_skew_daemon
 # Required-Start:    $network $syslog $google_instance_setup
 # Required-Stop:     $network
 # Default-Start:     2 3 4 5

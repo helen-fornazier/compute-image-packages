@@ -14,7 +14,7 @@
 #     limitations under the License.
 #
 ### BEGIN INIT INFO
-# Provides:          google_instance_setup
+# Provides:          $google_instance_setup
 # X-Start-Before:    ssh
 # Required-Start:    $local_fs $network $syslog
 # Required-Stop:

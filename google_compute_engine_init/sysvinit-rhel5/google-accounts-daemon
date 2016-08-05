@@ -14,7 +14,7 @@
 #     limitations under the License.
 #
 ### BEGIN INIT INFO
-# Provides:          google_accounts_daemon
+# Provides:          $google_accounts_daemon
 # X-Start-Before:    ssh
 # Required-Start:    $local_fs $network $named $syslog $google_instance_setup
 # Required-Stop:

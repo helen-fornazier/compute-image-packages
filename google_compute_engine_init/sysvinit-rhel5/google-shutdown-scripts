@@ -14,7 +14,7 @@
 #     limitations under the License.
 #
 ### BEGIN INIT INFO
-# Provides:          google_shutdown_scripts
+# Provides:          $google_shutdown_scripts
 # Required-Start:
 # Required-Stop:     $remote_fs $syslog docker kubelet
 # Default-Start:     1 2 3 4 5

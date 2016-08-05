@@ -14,7 +14,7 @@
 #     limitations under the License.
 #
 ### BEGIN INIT INFO
-# Provides:          google_startup_scripts
+# Provides:          $google_startup_scripts
 # Required-Start:    $all $google_instance_setup
 # Required-Stop:
 # Default-Start:     2 3 4 5
