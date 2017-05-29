@@ -130,11 +130,10 @@ class IpForwardingUtils(object):
     address = address if IP_ALIAS_REGEX.match(address) else '%s/32' % address
     cmd = 'alias'
     try:
-      forwarded_ips = netifaces.ifaddresses('lo' + self.proto_id)
+      forwarded_ips = netifaces.ifaddresses(interface)
     except (ValueError, KeyError) as e:
       cmd = 'create'
     self._RunIfconfig(args=[interface, cmd, address])
-    self._RunIfconfig(args=['lo' + self.proto_id, cmd, address])
 
   def RemoveForwardedIp(self, address, interface):
     """Delete an IP address on the network interface.
@@ -145,4 +144,3 @@ class IpForwardingUtils(object):
     """
     address = address if IP_REGEX.match(address) else address[:-3]
     self._RunIfconfig(args=[interface, '-alias', address])
-    self._RunIfconfig(args=['lo' + self.proto_id, '-alias', address])

@@ -130,17 +130,17 @@ class IpForwardingDaemon(object):
     Args:
       result: dict, the metadata response with the new network interfaces.
     """
+    ip_addresses = []
     for network_interface in result:
       mac_address = network_interface.get('mac')
       interface = self.network_utils.GetNetworkInterface(mac_address)
-      ip_addresses = []
       if interface:
         ip_addresses.extend(network_interface.get('forwardedIps', []))
         ip_addresses.extend(network_interface.get('ipAliases', []))
-        self._HandleForwardedIps(ip_addresses, interface)
       else:
         message = 'Network interface not found for MAC address: %s.'
         self.logger.warning(message, mac_address)
+    self._HandleForwardedIps(ip_addresses, 'lo' + self.ip_forwarding_utils.proto_id)
 
 
 def main():
