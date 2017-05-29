@@ -40,11 +40,14 @@ class NetworkUtils(object):
     """
     interfaces = {}
     for interface in netifaces.interfaces():
+      try:
         mac_address = netifaces.ifaddresses(interface)[netifaces.AF_LINK][0]['addr']
         if  mac_address == interface:
-            message = 'Unable to determine MAC address for %s.'
-            self.logger.warning(message, interface)
-            continue
+            raise Exception('No MAC Address')
+      except Exception, e:
+        message = 'Unable to determine MAC address for %s. %s.'
+        self.logger.warning(message, interface, str(e))
+      else:
         interfaces[mac_address] = interface
     return interfaces
 
