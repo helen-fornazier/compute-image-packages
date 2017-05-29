@@ -126,7 +126,7 @@ class AccountsUtils(object):
     #
     # To solve the issue, make the password '*' which is also recognized
     # as locked but does not prevent SSH login.
-    command = ['useradd', '-m', '-s', '/bin/bash', '-p', '*', user]
+    command = ['useradd', '-m', user]
     try:
       subprocess.check_call(command)
     except subprocess.CalledProcessError as e:

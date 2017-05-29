@@ -27,7 +27,7 @@ from google_compute_engine import logger
 from google_compute_engine import metadata_watcher
 from google_compute_engine.accounts import accounts_utils
 
-LOCKFILE = '/var/lock/google_accounts.lock'
+LOCKFILE = '/var/spool/lock/google_accounts.lock'
 
 
 class AccountsDaemon(object):
