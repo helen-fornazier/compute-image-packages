@@ -117,7 +117,9 @@ class IpForwardingUtils(object):
       return []
     forwarded_ips = []
     for ip in ips:
-      forwarded_ips.append(ip['addr'] + '/' + str(netaddr.IPAddress(ip['netmask']).netmask_bits()))
+      netmask = int(subprocess.check_output("ifconfig lo%s | grep %s | awk '{printf $NF}'" %
+                                            (self.proto_id, ip['addr']), shell=True), 16)
+      forwarded_ips.append(ip['addr'] + '/' + str(netaddr.IPAddress(netmask).netmask_bits()))
     return self.ParseForwardedIps(forwarded_ips)
 
   def AddForwardedIp(self, address, interface):
