@@ -80,16 +80,11 @@ class AccountsUtils(object):
 
     try:
       with open(self.google_sudoers_file, 'a+') as group:
-        """Check if the group is already in the sudoers file"""
-        found = False
+        group.seek(0)
         message = '%{0} ALL=(ALL:ALL) NOPASSWD:ALL'.format(
             self.google_sudoers_group)
-        for line in group:
-          if message in line:
-            found = True
-            break
-        if not found:
-          group.write('\n' + message)
+        if not any(message == x.rstrip('\r\n') for x in group):
+            group.write(message + '\n')
     except IOError as e:
       self.logger.error(
           'Could not write sudoers file. %s. %s',
