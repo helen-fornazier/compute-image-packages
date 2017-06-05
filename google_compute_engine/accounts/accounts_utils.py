@@ -43,10 +43,7 @@ class AccountsUtils(object):
     """
     self.logger = logger
     self.google_sudoers_group = 'google-sudoers'
-    if os.path.exists('/etc/sudoers.d'):
-      self.google_sudoers_file = '/etc/sudoers.d/google_sudoers'
-    else:
-      self.google_sudoers_file = '/etc/sudoers'
+    self.google_sudoers_file = '/etc/doas.conf'
     self.google_users_dir = '/var/lib/google'
     self.google_users_file = os.path.join(self.google_users_dir, 'google_users')
 
@@ -81,7 +78,7 @@ class AccountsUtils(object):
     try:
       with open(self.google_sudoers_file, 'a+') as group:
         group.seek(0)
-        message = '%{0} ALL=(ALL:ALL) NOPASSWD:ALL'.format(
+        message = 'permit nopass keepenv :{0}'.format(
             self.google_sudoers_group)
         if not any(message == x.rstrip('\r\n') for x in group):
             group.write(message + '\n')
