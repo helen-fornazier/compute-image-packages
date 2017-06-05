@@ -50,7 +50,7 @@ class ScriptExecutor(object):
       metadata_script: string, the file location of an executable script.
     """
     process = subprocess.Popen(
-        metadata_script, shell=True, executable='${LOCALBASE}/bin/bash',
+        metadata_script, shell=True, executable='/bin/ksh',
         stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
     while True:
       for line in iter(process.stdout.readline, b''):
