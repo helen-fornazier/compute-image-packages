@@ -108,7 +108,7 @@ class NetworkSetup(object):
     if os.path.exists(self.dhclient_script):
       dhclient_conf = '/etc/dhclient.conf'
       if os.path.exists(dhclient_conf):
-        subprocess.call('sed -i "" "/^script/d" ' + dhclient_conf, shell=True)
+        subprocess.call('sed -i "/^script/d" ' + dhclient_conf, shell=True)
       subprocess.call('echo \'script "%s";\' >> %s' % (self.dhclient_script, dhclient_conf), shell=True)
     for interface in interfaces:
       try:
