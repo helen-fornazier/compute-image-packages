@@ -62,7 +62,7 @@ class ClockSkewDaemon(object):
     ntpd_inactive = subprocess.call(['/etc/rc.d/ntpd', 'check'])
     try:
       if not ntpd_inactive: subprocess.check_call(['/etc/rc.d/ntpd', 'stop'])
-      subprocess.check_call('ntpdate `awk \'$1=="servers" {print $2}\' /etc/ntpd.conf`', shell=True)
+      subprocess.check_call('rdate `awk \'$1=="servers" {print $2}\' /etc/ntpd.conf`', shell=True)
       if not ntpd_inactive: subprocess.check_call(['/etc/rc.d/ntpd', 'start'])
     except subprocess.CalledProcessError:
       self.logger.warning('Failed to sync system time with hardware clock.')
