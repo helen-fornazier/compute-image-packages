@@ -118,15 +118,7 @@ class InstanceSetup(object):
   def _StartSshd(self):
     """Initialize the SSH daemon."""
     # Exit as early as possible.
-    # Instance setup systemd scripts block sshd from starting.
-    if os.path.exists('${LOCALBASE}/bin/systemctl'):
-      return
-    elif (os.path.exists('/etc/rc.d/ssh') or
-          os.path.exists('/etc/rc/ssh.conf')):
-      subprocess.call(['/etc/rc.d/ssh', 'start'])
-      subprocess.call(['/etc/rc.d/ssh', 'reload'])
-    elif (os.path.exists('/etc/rc.d/sshd') or
-          os.path.exists('/etc/rc/sshd.conf')):
+    if (os.path.exists('/etc/rc.d/sshd')):
       subprocess.call(['/etc/rc.d/sshd', 'start'])
       subprocess.call(['/etc/rc.d/sshd', 'reload'])
 

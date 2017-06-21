@@ -38,7 +38,7 @@ class InstanceConfig(config_manager.ConfigManager):
       'This file is automatically created at boot time by the %s script. Do '
       'not edit this file directly. If you need to add items to this file, '
       'create or edit %s instead and then run '
-      '${PREFIX}/bin/google_instance_setup.')
+      '/usr/local/bin/google_instance_setup.')
   instance_config_options = {
       'Accounts': {
           'deprovision_remove': 'false',
