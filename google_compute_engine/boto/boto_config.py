@@ -18,8 +18,8 @@
 If a project ID is not provided, this request the project ID from the
 metadata server and install the compute authentication plugin.
 
-Note the config starts with the content in /etc/boto.cfg.template,
-overrides settings, and then persists it into /etc/boto.cfg. This
+Note the config starts with the content in %%BOTOCFG%%/etc/boto.cfg.template,
+overrides settings, and then persists it into %%BOTOCFG%%/etc/boto.cfg. This
 is done so that the system boto.cfg can be removed prior to image
 packaging.
 """
@@ -34,8 +34,8 @@ from google_compute_engine import metadata_watcher
 class BotoConfig(object):
   """Creates a boto config file for standalone GSUtil."""
 
-  boto_config = '/etc/boto.cfg'
-  boto_config_template = '/etc/boto.cfg.template'
+  boto_config = '%%BOTOCFG%%/etc/boto.cfg'
+  boto_config_template = '%%BOTOCFG%%/etc/boto.cfg.template'
   boto_config_script = os.path.abspath(__file__)
   boto_config_header = (
       'This file is automatically created at boot time by the %s script. Do '

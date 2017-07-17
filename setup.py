@@ -17,8 +17,54 @@
 
 import glob
 
+import fnmatch
+import os
+import platform
 import setuptools
+import setuptools.command.build_py
 
+class ReplaceVarsCommand(setuptools.command.build_py.build_py):
+    """Custom command to replace variables inside the code according with the current system """
+
+    def findReplace(self, directory, find, replace, filePattern):
+        for path, dirs, files in os.walk(os.path.abspath(directory)):
+            for filename in fnmatch.filter(files, filePattern):
+                filepath = os.path.join(path, filename)
+                with open(filepath) as f:
+                    s = f.read()
+                s = s.replace(find, replace)
+                with open(filepath, "w") as f:
+                    f.write(s)
+
+    def run(self):
+        replace = {}
+        if platform.system == "FreeBSD":
+            replace["%%LOCALBASE%%"] = "/usr/local"
+            replace["%%BOTOCFG%%"] = "/usr/local"
+            replace["%%CFGDIR%%"] = "/usr/local/etc"
+            replace["%%VARLOCK%%"] = "/var/spool/lock"
+
+        elif platform.system == "OpenBSD":
+            replace["%%LOCALBASE%%"] = "/usr/local"
+            replace["%%BOTOCFG%%"] = ""
+            replace["%%CFGDIR%%"] = "/usr/local/etc"
+            replace["%%VARLOCK%%"] = "/var/spool/lock"
+
+        else:
+            replace["%%LOCALBASE%%"] = ""
+            replace["%%BOTOCFG%%"] = ""
+            replace["%%CFGDIR%%"] = "/etc/default"
+            replace["%%VARLOCK%%"] = "/var/lock"
+
+        for k in replace:
+            self.findReplace("build", k, replace[k], "*.py")
+
+class BuildPyCommand(setuptools.command.build_py.build_py):
+    """Custom build command."""
+
+    def run(self):
+        setuptools.command.build_py.build_py.run(self)
+        self.run_command('replace_vars')
 
 setuptools.setup(
     author='Google Compute Engine Team',
@@ -33,6 +79,10 @@ setuptools.setup(
     scripts=glob.glob('scripts/*'),
     url='https://github.com/GoogleCloudPlatform/compute-image-packages',
     version='2.4.0',
+    cmdclass={
+        'replace_vars': ReplaceVarsCommand,
+        'build_py': BuildPyCommand,
+    },
     # Entry points create scripts in /usr/bin that call a function.
     entry_points={
         'console_scripts': [

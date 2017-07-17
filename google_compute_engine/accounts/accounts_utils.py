@@ -43,8 +43,8 @@ class AccountsUtils(object):
     """
     self.logger = logger
     self.google_sudoers_group = 'google-sudoers'
-    self.google_sudoers_file = '/etc/sudoers.d/google_sudoers'
-    self.google_users_dir = '/var/lib/google'
+    self.google_sudoers_file = '%%LOCALBASE%%/etc/sudoers.d/google_sudoers'
+    self.google_users_dir = '%%LOCALBASE%%/var/lib/google'
     self.google_users_file = os.path.join(self.google_users_dir, 'google_users')
 
     self._CreateSudoersGroup()

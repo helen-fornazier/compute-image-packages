@@ -38,7 +38,7 @@ from google_compute_engine import network_utils
 
 from google_compute_engine.ip_forwarding import ip_forwarding_utils
 
-LOCKFILE = '/var/lock/google_ip_forwarding.lock'
+LOCKFILE = '%%VARLOCK%%/google_ip_forwarding.lock'
 
 
 class IpForwardingDaemon(object):

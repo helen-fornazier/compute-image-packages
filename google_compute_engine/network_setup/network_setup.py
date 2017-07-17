@@ -74,7 +74,7 @@ class NetworkSetup(object):
     Args:
       interfaces: list of string, the output device names enable.
     """
-    interface_path = '/etc/sysconfig/network-scripts'
+    interface_path = '%%LOCALBASE%%/etc/sysconfig/network-scripts'
     for interface in interfaces:
       interface_config = os.path.join(interface_path, 'ifcfg-%s' % interface)
       if os.path.exists(interface_config):
@@ -130,7 +130,7 @@ class NetworkSetup(object):
       except subprocess.CalledProcessError:
         self.logger.warning('Could not enable Ethernet interfaces.')
     else:
-      if os.path.exists('/etc/sysconfig/network-scripts'):
+      if os.path.exists('%%LOCALBASE%%/etc/sysconfig/network-scripts'):
         self._DisableNetworkManager(interfaces)
       self._ConfigureNetwork(interfaces)
 

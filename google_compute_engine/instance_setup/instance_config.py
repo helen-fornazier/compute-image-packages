@@ -16,8 +16,8 @@
 """A library used to set up the instance's default configurations file.
 
 Note that the configurations in
-/etc/default/instance_configs.cfg.template override the values set in
-/etc/default/instance_configs.cfg. The system instance_configs.cfg may be
+%%CFGDIR%%/instance_configs.cfg.template override the values set in
+%%CFGDIR%%/instance_configs.cfg. The system instance_configs.cfg may be
 overridden during package upgrade.
 """
 
@@ -32,7 +32,7 @@ from google_compute_engine.compat import stringio
 class InstanceConfig(config_manager.ConfigManager):
   """Creates a defaults config file for instance configuration."""
 
-  instance_config = '/etc/default/instance_configs.cfg'
+  instance_config = '%%CFGDIR%%/instance_configs.cfg'
   instance_config_distro = '%s.distro' % instance_config
   instance_config_template = '%s.template' % instance_config
   instance_config_script = os.path.abspath(__file__)
