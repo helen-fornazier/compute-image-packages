@@ -99,7 +99,7 @@ ${pam_homedir}
   else
     gsed -i "/account.*pam_nologin.so/ a${added_comment}\n${pam_admin}" ${pam_config}.new
     gsed -i "/account.*pam_nologin.so/ a${added_comment}\n${pam_login}" ${pam_config}.new
-    gsed -i "/pam_loginuid.so/ a${added_comment}\n${pam_homedir}" ${pam_config}.new
+    gsed -i "/session.*pam_permit.so/ a${added_comment}\n${pam_homedir}" ${pam_config}.new
   fi
 }
 
