@@ -185,6 +185,12 @@ class ScriptRetriever(object):
       self.logger.info('Found %s in metadata.' % metadata_key)
       script_dict[metadata_key] = self._DownloadScript(metadata_value, dest_dir)
 
+    metadata_args_key = '%s-script-args' % self.script_type
+    metadata_args_value = attribute_data.get(metadata_args_key)
+    if metadata_args_value:
+      self.logger.info('Found %s in metadata.' % metadata_args_key)
+      script_dict[metadata_args_key] = attribute_data.get(metadata_args_key)
+
     return script_dict
 
   def GetScripts(self, dest_dir):

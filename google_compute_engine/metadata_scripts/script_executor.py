@@ -44,13 +44,16 @@ class ScriptExecutor(object):
     mode = os.stat(metadata_script).st_mode
     os.chmod(metadata_script, mode | stat.S_IEXEC)
 
-  def _RunScript(self, metadata_key, metadata_script):
+  def _RunScript(self, metadata_key, metadata_script, metadata_args):
     """Run a script and log the streamed script output.
 
     Args:
       metadata_key: string, the key specifing the metadata script.
       metadata_script: string, the file location of an executable script.
+      metadata_args: string, the arguments to be given to the script
     """
+    if metadata_args is not None:
+        metadata_script = metadata_script + ' ' + metadata_args
     process = subprocess.Popen(
         metadata_script, shell=True,
         executable=constants.LOCALBASE + '/bin/bash',
@@ -75,7 +78,8 @@ class ScriptExecutor(object):
     metadata_keys = [key for key in metadata_keys if script_dict.get(key)]
     if not metadata_keys:
       self.logger.info('No %s scripts found in metadata.', self.script_type)
+    metadata_args = script_dict.get(self.script_type + '-script-args')
     for metadata_key in metadata_keys:
       metadata_script = script_dict.get(metadata_key)
       self._MakeExecutable(metadata_script)
-      self._RunScript(metadata_key, metadata_script)
+      self._RunScript(metadata_key, metadata_script, metadata_args)
