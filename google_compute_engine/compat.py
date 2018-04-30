@@ -24,7 +24,10 @@ if sys.version_info >= (3, 6):
 else:
   import platform as distro
 
-distribution = distro.linux_distribution()
+if 'freebsd' in distro.system().lower():
+  distribution = distro.version().split()
+else:
+  distribution = distro.linux_distribution()
 distro_name = distribution[0].lower()
 distro_version = distribution[1].split('.')[0]
 distro_utils = None
