@@ -13,21 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utilities that are distro specific."""
+"""Utilities that are distro specific for use on FreeBSD 11."""
 
 import subprocess
+from google_compute_engine.distro import helpers
+from google_compute_engine.distro import utils
 
 
-class Utils(object):
-  """Utilities used by Linux guest services."""
-
-  def __init__(self, debug=False):
-    """Constructor.
-
-    Args:
-      debug: bool, True if debug output should write to the console.
-    """
-    self.debug = debug
+class Utils(utils.Utils):
+  """Utilities used by Linux guest services on FreeBSD 11."""
 
   def EnableNetworkInterfaces(
       self, interfaces, logger, dhclient_script=None):
@@ -38,14 +32,19 @@ class Utils(object):
       logger: logger object, used to write to SysLog and serial port.
       dhclient_script: string, the path to a dhclient script used by dhclient.
     """
-    pass
+    helpers.CallDhclient(interfaces, logger)
 
   def HandleClockSync(self, logger):
     """Called when clock drift token changes."""
-    command = ['/sbin/hwclock', '--hctosys']
+
+    ntpd_inactive = subprocess.call(['service', 'ntpd', 'status'])
     try:
-      subprocess.check_call(command)
+      if not ntpd_inactive:
+        subprocess.check_call(['service', 'ntpd', 'stop'])
+      subprocess.check_call('ntpdate `awk \'$1=="server" {print $2}\' /etc/ntp.conf`', shell=True)
+      if not ntpd_inactive:
+        subprocess.check_call(['service', 'ntpd', 'start'])
     except subprocess.CalledProcessError:
-      logger.warning('Failed to sync system time with hardware clock.')
+      logger.warning('Failed to sync system time with ntp server.')
     else:
-      logger.info('Synced system time with hardware clock.')
+      logger.info('Synced system time with ntp server.')
