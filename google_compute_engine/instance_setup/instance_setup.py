@@ -28,6 +28,7 @@ from google_compute_engine import file_utils
 from google_compute_engine import logger
 from google_compute_engine import metadata_watcher
 from google_compute_engine.boto import boto_config
+from google_compute_engine.compat import distro_utils
 from google_compute_engine.instance_setup import instance_config
 
 
@@ -47,6 +48,7 @@ class InstanceSetup(object):
     self.watcher = metadata_watcher.MetadataWatcher(logger=self.logger)
     self.metadata_dict = None
     self.instance_config = instance_config.InstanceConfig(logger=self.logger)
+    self.distro_utils = distro_utils.Utils(debug=debug)
 
     if self.instance_config.GetOptionBool('InstanceSetup', 'network_enabled'):
       self.metadata_dict = self.watcher.GetMetadata()
@@ -141,21 +143,6 @@ class InstanceSetup(object):
     file_utils.SetPermissions(key_dest, mode=0o600)
     file_utils.SetPermissions('%s.pub' % key_dest, mode=0o644)
 
-  def _StartSshd(self):
-    """Initialize the SSH daemon."""
-    # Exit as early as possible.
-    # Instance setup systemd scripts block sshd from starting.
-    if os.path.exists(constants.LOCALBASE + '/bin/systemctl'):
-      return
-    elif (os.path.exists('/etc/init.d/ssh') or
-          os.path.exists('/etc/init/ssh.conf')):
-      subprocess.call(['service', 'ssh', 'start'])
-      subprocess.call(['service', 'ssh', 'reload'])
-    elif (os.path.exists('/etc/init.d/sshd') or
-          os.path.exists('/etc/init/sshd.conf')):
-      subprocess.call(['service', 'sshd', 'start'])
-      subprocess.call(['service', 'sshd', 'reload'])
-
   def _SetSshHostKeys(self, host_key_types=None):
     """Regenerates SSH host keys when the VM is restarted with a new IP address.
 
@@ -181,7 +168,7 @@ class InstanceSetup(object):
         key_type = file_regex.match(key_file).group('type')
         key_dest = os.path.join(key_dir, key_file)
         self._GenerateSshKey(key_type, key_dest)
-      self._StartSshd()
+      self.distro_utils._StartSshd()
       self.instance_config.SetOption(section, 'instance_id', str(instance_id))
 
   def _GetNumericProjectId(self):

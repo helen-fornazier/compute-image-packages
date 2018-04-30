@@ -16,6 +16,8 @@
 """Utilities that are distro specific."""
 
 import subprocess
+import os
+from google_compute_engine import constants
 
 
 class Utils(object):
@@ -49,3 +51,18 @@ class Utils(object):
       logger.warning('Failed to sync system time with hardware clock.')
     else:
       logger.info('Synced system time with hardware clock.')
+
+  def _StartSshd(self):
+    """Initialize the SSH daemon."""
+    # Exit as early as possible.
+    # Instance setup systemd scripts block sshd from starting.
+    if os.path.exists(constants.LOCALBASE + '/bin/systemctl'):
+      return
+    elif (os.path.exists('/etc/init.d/ssh') or
+          os.path.exists('/etc/init/ssh.conf')):
+      subprocess.call(['service', 'ssh', 'start'])
+      subprocess.call(['service', 'ssh', 'reload'])
+    elif (os.path.exists('/etc/init.d/sshd') or
+          os.path.exists('/etc/init/sshd.conf')):
+      subprocess.call(['service', 'sshd', 'start'])
+      subprocess.call(['service', 'sshd', 'reload'])

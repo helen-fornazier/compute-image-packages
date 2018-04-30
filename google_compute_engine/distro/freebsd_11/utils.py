@@ -16,8 +16,10 @@
 """Utilities that are distro specific for use on FreeBSD 11."""
 
 import subprocess
+import os
 from google_compute_engine.distro import helpers
 from google_compute_engine.distro import utils
+from google_compute_engine import constants
 
 
 class Utils(utils.Utils):
@@ -48,3 +50,18 @@ class Utils(utils.Utils):
       logger.warning('Failed to sync system time with ntp server.')
     else:
       logger.info('Synced system time with ntp server.')
+
+  def _StartSshd(self):
+    """Initialize the SSH daemon."""
+    # Exit as early as possible.
+    # Instance setup systemd scripts block sshd from starting.
+    if os.path.exists(constants.LOCALBASE + '/bin/systemctl'):
+      return
+    elif (os.path.exists('/etc/rc.d/ssh') or
+          os.path.exists('/etc/rc/ssh.conf')):
+      subprocess.call(['service', 'ssh', 'start'])
+      subprocess.call(['service', 'ssh', 'reload'])
+    elif (os.path.exists('/etc/rc.d/sshd') or
+          os.path.exists('/etc/rc/sshd.conf')):
+      subprocess.call(['service', 'sshd', 'start'])
+      subprocess.call(['service', 'sshd', 'reload'])
