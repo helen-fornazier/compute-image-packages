@@ -69,6 +69,8 @@ remove_from_config() {
 }
 
 remove_from_nss_config() {
+  gsed -i '/^passwd:/ s/ cache_oslogin oslogin//' ${nss_config}.new
+  gsed -i '/^passwd:/ s/ cache oslogin//' ${nss_config}.new
   gsed -i '/^passwd:/ s/ oslogin//' ${nss_config}.new
 }
 
@@ -80,7 +82,7 @@ add_to_sshd_config() {
 
 add_to_nss_config() {
   remove_from_nss_config
-  gsed -i '/^passwd:/ s/$/ oslogin/' ${nss_config}.new
+  gsed -i '/^passwd:/ s/$/ cache_oslogin oslogin/' ${nss_config}.new
   # Replace compat by files (as compat cannot be used with other sources)
   gsed -i '/^passwd:/ s/compat/files/' ${nss_config}.new
 }
