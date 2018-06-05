@@ -104,12 +104,22 @@ int _nss_oslogin_getpwnam_r(const char *name, struct passwd *result,
 // nss_getpwent_r() is intentionally left unimplemented. This functionality is
 // now covered by the nss_cache binary and nss_cache module.
 
+void _nss_oslogin_getpwent_r() {}
+void _nss_oslogin_endpwent() {}
+void _nss_oslogin_setpwent() {}
+
 NSS_METHOD_PROTOTYPE(__nss_compat_getpwnam_r);
 NSS_METHOD_PROTOTYPE(__nss_compat_getpwuid_r);
+NSS_METHOD_PROTOTYPE(__nss_compat_getpwent_r);
+NSS_METHOD_PROTOTYPE(__nss_compat_setpwent);
+NSS_METHOD_PROTOTYPE(__nss_compat_endpwent);
 
 static ns_mtab methods[] = {
     { NSDB_PASSWD, "getpwnam_r", __nss_compat_getpwnam_r, (void*)_nss_oslogin_getpwnam_r },
     { NSDB_PASSWD, "getpwuid_r", __nss_compat_getpwuid_r, (void*)_nss_oslogin_getpwuid_r },
+    { NSDB_PASSWD, "getpwent_r", __nss_compat_getpwent_r, (void*)_nss_oslogin_getpwent_r },
+    { NSDB_PASSWD, "endpwent",   __nss_compat_endpwent,   (void*)_nss_oslogin_endpwent },
+    { NSDB_PASSWD, "setpwent",   __nss_compat_setpwent,   (void*)_nss_oslogin_setpwent },
 };
 
 ns_mtab *
