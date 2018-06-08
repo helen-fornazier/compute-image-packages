@@ -50,12 +50,3 @@ class Utils(utils.Utils):
       proto_id: string, the routing protocol identifier for Google IP changes.
     """
     return ip_forwarding_utils.IpForwardingUtilsIproute(logger, proto_id)
-
-  def IpForwardingUtils(self, logger, proto_id=None):
-    """Get system IP address configuration utilities.
-
-    Args:
-      logger: logger object, used to write to SysLog and serial port.
-      proto_id: string, the routing protocol identifier for Google IP changes.
-    """
-    return ip_forwarding_utils.IpForwardingUtilsIproute(logger, proto_id)
