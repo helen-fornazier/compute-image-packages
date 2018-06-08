@@ -49,4 +49,4 @@ class Utils(utils.Utils):
       logger: logger object, used to write to SysLog and serial port.
       proto_id: string, the routing protocol identifier for Google IP changes.
     """
-    return ip_forwarding_utils.IpForwardingUtilsIfconfig(logger)
+    return ip_forwarding_utils.IpForwardingUtilsIfconfig(logger, proto_id)

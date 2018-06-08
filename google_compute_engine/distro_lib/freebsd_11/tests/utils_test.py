@@ -51,5 +51,5 @@ class UtilsTest(unittest.TestCase):
     mocks.attach_mock(mock_call, 'call')
 
     utils.Utils.IpForwardingUtils(self.mock_setup, self.mock_logger, 66)
-    expected_calls = [mock.call.call(mock.ANY)]
+    expected_calls = [mock.call.call(mock.ANY, 66)]
     self.assertEqual(mocks.mock_calls, expected_calls)

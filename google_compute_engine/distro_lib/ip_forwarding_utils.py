@@ -145,19 +145,15 @@ class IpForwardingUtilsIproute(IpForwardingUtils):
 class IpForwardingUtilsIfconfig(IpForwardingUtils):
   """System IP address configuration utilities."""
 
-  def __init__(self, logger):
+  def __init__(self, logger, proto_id=None):
     """Constructor.
 
     Args:
       logger: logger object, used to write to SysLog and serial port.
+      proto_id: string, the routing protocol identifier for Google IP changes.
     """
-
-    # The following libs are just required when using this class
-    import ipaddress
-    import netifaces
-    import netaddr
-
     self.logger = logger
+    self.proto_id = proto_id or '66'
 
   def _RunIfconfig(self, args=None, options=None):
     """Run a command with ifconfig and return the response.
@@ -216,6 +212,7 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
     Returns:
       list, the IP address strings.
     """
+    interface = 'lo%d-%s' % (self.proto_id, interface)
     try:
       ips = netifaces.ifaddresses(interface)
       ips = ips[netifaces.AF_INET]
@@ -234,9 +231,13 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
       interface: string, the output device to use.
     """
     address = address if IP_ALIAS_REGEX.match(address) else '%s/32' % address
-    forwarded_ips = netifaces.ifaddresses(interface)
-    for ip in ipaddress.IPv4Network(address):
-      self._RunIfconfig(args=[interface, 'alias', ip])
+    interface = 'lo%d-%s' % (self.proto_id, interface)
+    cmd = 'alias'
+    try:
+      forwarded_ips = netifaces.ifaddresses(interface)
+    except (ValueError, KeyError) as e:
+      cmd = 'create'
+    self._RunIfconfig(args=[interface, cmd, address])
 
   def RemoveForwardedIp(self, address, interface):
     """Delete an IP address on the network interface.
@@ -246,5 +247,5 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
       interface: string, the output device to use.
     """
     address = address if IP_ALIAS_REGEX.match(address) else '%s/32' % address
-    for ip in ipaddress.IPv4Network(address):
-      self._RunIfconfig(args=[interface, '-alias', address])
+    interface = 'lo%d-%s' % (self.proto_id, interface)
+    self._RunIfconfig(args=[interface, '-alias', address])
