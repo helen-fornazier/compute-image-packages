@@ -28,7 +28,7 @@ Command used to fetch list of configured IPs:
 import logging.handlers
 
 from google_compute_engine import logger
-from google_compute_engine.networking.ip_forwarding import ip_forwarding_utils
+from google_compute_engine.compat import distro_utils
 
 
 class IpForwarding(object):
@@ -44,7 +44,8 @@ class IpForwarding(object):
     facility = logging.handlers.SysLogHandler.LOG_DAEMON
     self.logger = logger.Logger(
         name='google-ip-forwarding', debug=debug, facility=facility)
-    self.ip_forwarding_utils = ip_forwarding_utils.IpForwardingUtils(
+    self.distro_utils = distro_utils.Utils(debug=debug)
+    self.ip_forwarding_utils = self.distroUtils.IpForwardingUtils(
         logger=self.logger, proto_id=proto_id)
 
   def _LogForwardedIpChanges(
