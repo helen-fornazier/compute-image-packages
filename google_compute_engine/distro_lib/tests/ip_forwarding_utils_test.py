@@ -174,7 +174,8 @@ class IpForwardingUtilsIprouteTest(unittest.TestCase):
     self.mock_utils._RunIpRoute = mock_run
     self.mock_utils.ParseForwardedIps = mock_parse
 
-    self.assertEqual(self.mock_utils.GetForwardedIps('interface'), ['Test'])
+    self.assertEqual(
+        self.mock_utils.GetForwardedIps('interface', 'ip'), ['Test'])
     mock_options.assert_called_once_with(dev='interface')
     mock_run.assert_called_once_with(
         args=['ls', 'table', 'local', 'type', 'local'], options=self.options)

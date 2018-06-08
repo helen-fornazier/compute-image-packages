@@ -102,11 +102,12 @@ class IpForwardingUtilsIproute(IpForwardingUtils):
         self.logger.warning('Could not parse IP address: "%s".', ip)
     return addresses
 
-  def GetForwardedIps(self, interface):
+  def GetForwardedIps(self, interface, interface_ip):
     """Retrieve the list of configured forwarded IP addresses.
 
     Args:
       interface: string, the output device to query.
+      interface_ip: string, current interface ip address.
 
     Returns:
       list, the IP address strings.
@@ -207,11 +208,12 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
         self.logger.warning('Could not parse IP address: "%s".', ip)
     return addresses
 
-  def GetForwardedIps(self, interface):
+  def GetForwardedIps(self, interface, interface_ip):
     """Retrieve the list of configured forwarded IP addresses.
 
     Args:
       interface: string, the output device to query.
+      interface_ip: string, current interface ip address.
 
     Returns:
       list, the IP address strings.
@@ -223,7 +225,8 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
       return []
     forwarded_ips = []
     for ip in ips:
-      forwarded_ips.append(ip['addr'] + '/' + str(netaddr.IPAddress(ip['netmask']).netmask_bits()))
+      if ip != interface_ip:
+        forwarded_ips.append(ip['addr'] + '/' + str(netaddr.IPAddress(ip['netmask']).netmask_bits()))
     return self.ParseForwardedIps(forwarded_ips)
 
   def AddForwardedIp(self, address, interface):

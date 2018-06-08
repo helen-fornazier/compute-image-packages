@@ -29,11 +29,12 @@ class IpForwardingUtils(object):
     """
     pass
 
-  def GetForwardedIps(self, interface):
+  def GetForwardedIps(self, interface, interface_ip):
     """Retrieve the list of configured forwarded IP addresses.
 
     Args:
       interface: string, the output device to query.
+      interface_ip: string, current interface ip address.
 
     Returns:
       list, the IP address strings.
