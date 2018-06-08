@@ -15,11 +15,8 @@
 
 """Utilities for configuring IP address forwarding."""
 
-import ipaddress
 import re
 import subprocess
-import netifaces
-import netaddr
 
 from google_compute_engine.networking.ip_forwarding import IpForwardingUtils
 
@@ -154,6 +151,12 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
     Args:
       logger: logger object, used to write to SysLog and serial port.
     """
+
+    # The following libs are just required when using this class
+    import ipaddress
+    import netifaces
+    import netaddr
+
     self.logger = logger
 
   def _RunIfconfig(self, args=None, options=None):
