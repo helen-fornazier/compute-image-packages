@@ -15,6 +15,7 @@
 
 """Utilities for configuring IP address forwarding."""
 
+import ipaddress
 import re
 import subprocess
 import netifaces
@@ -27,15 +28,13 @@ IP_ALIAS_REGEX = re.compile(r'\A(\d{1,3}\.){3}\d{1,3}/\d{1,2}\Z')
 class IpForwardingUtilsFreeBSD(object):
   """System IP address configuration utilities."""
 
-  def __init__(self, logger, proto_id=None):
+  def __init__(self, logger):
     """Constructor.
 
     Args:
       logger: logger object, used to write to SysLog and serial port.
-      proto_id: string, the routing protocol identifier for Google IP changes.
     """
     self.logger = logger
-    self.proto_id = proto_id or '66'
 
   def _RunIfconfig(self, args=None, options=None):
     """Run a command with ifconfig and return the response.
@@ -94,7 +93,6 @@ class IpForwardingUtilsFreeBSD(object):
     Returns:
       list, the IP address strings.
     """
-    interface = 'lo%d-%s' % (self.proto_id, interface)
     try:
       ips = netifaces.ifaddresses(interface)
       ips = ips[netifaces.AF_INET]
@@ -113,13 +111,9 @@ class IpForwardingUtilsFreeBSD(object):
       interface: string, the output device to use.
     """
     address = address if IP_ALIAS_REGEX.match(address) else '%s/32' % address
-    interface = 'lo%d-%s' % (self.proto_id, interface)
-    cmd = 'alias'
-    try:
-      forwarded_ips = netifaces.ifaddresses(interface)
-    except (ValueError, KeyError) as e:
-      cmd = 'create'
-    self._RunIfconfig(args=[interface, cmd, address])
+    forwarded_ips = netifaces.ifaddresses(interface)
+    for ip in ipaddress.IPv4Network(address):
+      self._RunIfconfig(args=[interface, 'alias', ip])
 
   def RemoveForwardedIp(self, address, interface):
     """Delete an IP address on the network interface.
@@ -129,8 +123,8 @@ class IpForwardingUtilsFreeBSD(object):
       interface: string, the output device to use.
     """
     address = address if IP_ALIAS_REGEX.match(address) else '%s/32' % address
-    interface = 'lo%d-%s' % (self.proto_id, interface)
-    self._RunIfconfig(args=[interface, '-alias', address])
+    for ip in ipaddress.IPv4Network(address):
+      self._RunIfconfig(args=[interface, '-alias', address])
 
 class IpForwardingUtils(object):
   """System IP address configuration utilities."""
