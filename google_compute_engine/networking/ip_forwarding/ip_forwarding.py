@@ -20,9 +20,9 @@ for the associated interfaces, and add or remove addresses from the interfaces
 to make them match. Only remove those which match our proto code.
 
 Command used to add IPs:
-  ip route add to local $IP/32 dev eth0 proto 66
+  ip route add to local $IP/32 dev eth0 proto '66'
 Command used to fetch list of configured IPs:
-  ip route ls table local type local dev eth0 scope host proto 66
+  ip route ls table local type local dev eth0 scope host proto '66'
 """
 
 import logging.handlers

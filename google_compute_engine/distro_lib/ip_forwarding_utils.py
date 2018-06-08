@@ -212,7 +212,7 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
     Returns:
       list, the IP address strings.
     """
-    interface = 'lo%d-%s' % (self.proto_id, interface)
+    interface = 'lo%s-%s' % (self.proto_id, interface)
     try:
       ips = netifaces.ifaddresses(interface)
       ips = ips[netifaces.AF_INET]
@@ -231,7 +231,7 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
       interface: string, the output device to use.
     """
     address = address if IP_ALIAS_REGEX.match(address) else '%s/32' % address
-    interface = 'lo%d-%s' % (self.proto_id, interface)
+    interface = 'lo%s-%s' % (self.proto_id, interface)
     cmd = 'alias'
     try:
       forwarded_ips = netifaces.ifaddresses(interface)
@@ -247,5 +247,5 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
       interface: string, the output device to use.
     """
     address = address if IP_ALIAS_REGEX.match(address) else '%s/32' % address
-    interface = 'lo%d-%s' % (self.proto_id, interface)
+    interface = 'lo%s-%s' % (self.proto_id, interface)
     self._RunIfconfig(args=[interface, '-alias', address])
