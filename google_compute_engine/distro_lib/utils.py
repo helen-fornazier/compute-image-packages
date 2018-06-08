@@ -47,7 +47,7 @@ class Utils(object):
     pass
 
   def IpForwardingUtils(logger, proto_id=None):
-  """Get system IP address configuration utilities.
+    """Get system IP address configuration utilities.
 
     Args:
       logger: logger object, used to write to SysLog and serial port.
