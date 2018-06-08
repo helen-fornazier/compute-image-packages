@@ -225,7 +225,7 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
       return []
     forwarded_ips = []
     for ip in ips:
-      if ip != interface_ip:
+      if ip['addr'] != interface_ip:
         forwarded_ips.append(ip['addr'] + '/' + str(netaddr.IPAddress(ip['netmask']).netmask_bits()))
     return self.ParseForwardedIps(forwarded_ips)
 
