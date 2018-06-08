@@ -238,7 +238,7 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
     """
     address = address if IP_ALIAS_REGEX.match(address) else '%s/32' % address
     forwarded_ips = netifaces.ifaddresses(interface)
-    for ip in ipaddress.IPv4Network(address):
+    for ip in ipaddress.IPv4Network(address, strict=False):
       self._RunIfconfig(args=[interface, 'alias', '%s/32' % str(ip)])
 
   def RemoveForwardedIp(self, address, interface):
@@ -249,5 +249,4 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
       interface: string, the output device to use.
     """
     address = address if IP_ALIAS_REGEX.match(address) else '%s/32' % address
-    for ip in ipaddress.IPv4Network(address):
-      self._RunIfconfig(args=[interface, '-alias', str(ip)])
+    self._RunIfconfig(args=[interface, '-alias', address])
