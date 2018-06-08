@@ -18,7 +18,7 @@
 import re
 import subprocess
 
-from google_compute_engine.networking.ip_forwarding import IpForwardingUtils
+from google_compute_engine.networking.ip_forwarding.ip_forwarding_utils import IpForwardingUtils
 
 
 IP_REGEX = re.compile(r'\A(\d{1,3}\.){3}\d{1,3}\Z')

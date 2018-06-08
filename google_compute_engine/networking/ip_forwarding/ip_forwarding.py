@@ -45,7 +45,7 @@ class IpForwarding(object):
     self.logger = logger.Logger(
         name='google-ip-forwarding', debug=debug, facility=facility)
     self.distro_utils = distro_utils.Utils(debug=debug)
-    self.ip_forwarding_utils = self.distroUtils.IpForwardingUtils(
+    self.ip_forwarding_utils = self.distro_utils.IpForwardingUtils(
         logger=self.logger, proto_id=proto_id)
 
   def _LogForwardedIpChanges(

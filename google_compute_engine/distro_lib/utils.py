@@ -46,7 +46,7 @@ class Utils(object):
     """
     pass
 
-  def IpForwardingUtils(logger, proto_id=None):
+  def IpForwardingUtils(self, logger, proto_id=None):
     """Get system IP address configuration utilities.
 
     Args:
