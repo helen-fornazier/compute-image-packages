@@ -17,6 +17,12 @@
 
 import re
 import subprocess
+try:
+  # The following libs are required only for class IpForwardingUtilsIfconfig
+  import netifaces
+  import netaddr
+except ImportError:
+  pass
 
 from google_compute_engine.networking.ip_forwarding.ip_forwarding_utils import IpForwardingUtils
 
@@ -142,11 +148,6 @@ class IpForwardingUtilsIproute(IpForwardingUtils):
     options = self._CreateRouteOptions(dev=interface)
     self._RunIpRoute(args=args, options=options)
 
-
-# TODO: check a better place to import these
-# The following libs are just required when using this class
-import netifaces
-import netaddr
 
 class IpForwardingUtilsIfconfig(IpForwardingUtils):
   """System IP address configuration utilities."""
