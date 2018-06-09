@@ -143,6 +143,11 @@ class IpForwardingUtilsIproute(IpForwardingUtils):
     self._RunIpRoute(args=args, options=options)
 
 
+# TODO: check a better place to import these
+# The following libs are just required when using this class
+import netifaces
+import netaddr
+
 class IpForwardingUtilsIfconfig(IpForwardingUtils):
   """System IP address configuration utilities."""
 
@@ -152,11 +157,6 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
     Args:
       logger: logger object, used to write to SysLog and serial port.
     """
-
-    # The following libs are just required when using this class
-    import ipaddress
-    import netifaces
-    import netaddr
 
     self.logger = logger
 
@@ -237,8 +237,7 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
       interface: string, the output device to use.
     """
     address = address if IP_ALIAS_REGEX.match(address) else '%s/32' % address
-    forwarded_ips = netifaces.ifaddresses(interface)
-    for ip in ipaddress.IPv4Network(address, strict=False):
+    for ip in list(netaddr.IPNetwork(address)):
       self._RunIfconfig(args=[interface, 'alias', '%s/32' % str(ip)])
 
   def RemoveForwardedIp(self, address, interface):
@@ -249,4 +248,5 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
       interface: string, the output device to use.
     """
     address = address if IP_ALIAS_REGEX.match(address) else '%s/32' % address
-    self._RunIfconfig(args=[interface, '-alias', address])
+    ip = netaddr.IPNetwork(address)
+    self._RunIfconfig(args=[interface, '-alias', str(ip.ip)])
