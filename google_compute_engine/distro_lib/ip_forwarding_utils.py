@@ -204,7 +204,7 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
     forwarded_ips = forwarded_ips or []
     for ip in forwarded_ips:
       if ip and (IP_REGEX.match(ip) or IP_ALIAS_REGEX.match(ip)):
-        addresses.extend(list(netaddr.IPNetwork(ip)))
+        addresses.extend([str(addr) for addr in list(netaddr.IPNetwork(ip))])
       else:
         self.logger.warning('Could not parse IP address: "%s".', ip)
     return addresses
