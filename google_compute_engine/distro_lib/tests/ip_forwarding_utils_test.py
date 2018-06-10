@@ -374,7 +374,7 @@ class IpForwardingUtilsIfconfigTest(unittest.TestCase):
     self.mock_utils._RunIfconfig = mock_run
 
     self.mock_utils.AddForwardedIp('1.1.1.1', 'interface')
-    mock_netaddr.IPNetwork.assert_called_once_with('1.1.1.1/32')
+    mock_netaddr.IPNetwork.assert_called_once_with('1.1.1.1')
     mock_run.assert_called_once_with(
         args=['interface', 'alias', '1.1.1.1/32'])
 
@@ -405,7 +405,7 @@ class IpForwardingUtilsIfconfigTest(unittest.TestCase):
     self.mock_utils._RunIfconfig = mock_run
 
     self.mock_utils.RemoveForwardedIp('1.1.1.1', 'interface')
-    mock_netaddr.IPNetwork.assert_called_once_with('1.1.1.1/32')
+    mock_netaddr.IPNetwork.assert_called_once_with('1.1.1.1')
     mock_run.assert_called_once_with(
         args=['interface', '-alias', '1.1.1.1'])
 

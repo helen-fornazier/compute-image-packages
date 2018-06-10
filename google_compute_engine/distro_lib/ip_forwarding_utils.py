@@ -239,7 +239,6 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
       address: string, the IP address to configure.
       interface: string, the output device to use.
     """
-    address = address if IP_ALIAS_REGEX.match(address) else '%s/32' % address
     for ip in list(netaddr.IPNetwork(address)):
       self._RunIfconfig(args=[interface, 'alias', '%s/32' % str(ip)])
 
@@ -250,6 +249,5 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
       address: string, the IP address to configure.
       interface: string, the output device to use.
     """
-    address = address if IP_ALIAS_REGEX.match(address) else '%s/32' % address
     ip = netaddr.IPNetwork(address)
     self._RunIfconfig(args=[interface, '-alias', str(ip.ip)])
