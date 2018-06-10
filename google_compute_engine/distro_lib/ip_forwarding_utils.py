@@ -205,7 +205,6 @@ class IpForwardingUtilsIfconfig(IpForwardingUtils):
     forwarded_ips = forwarded_ips or []
     for ip in forwarded_ips:
       if ip and (IP_REGEX.match(ip) or IP_ALIAS_REGEX.match(ip)):
-        ip = ip[:-3] if ip.endswith('/32') else ip
         addresses.extend([str(addr) for addr in list(netaddr.IPNetwork(ip))])
       else:
         self.logger.warning('Could not parse IP address: "%s".', ip)

@@ -282,9 +282,6 @@ class IpForwardingUtilsIfconfigTest(unittest.TestCase):
 
   @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.netaddr')
   def testParseForwardedIps(self, mock_netaddr):
-    def side_effect(arg):
-      return [arg]
-    mock_netaddr.IPNetwork.side_effect = side_effect
     self.assertEqual(self.mock_utils.ParseForwardedIps(None), [])
     self.assertEqual(self.mock_utils.ParseForwardedIps([]), [])
     self.assertEqual(self.mock_utils.ParseForwardedIps([None]), [])
@@ -302,6 +299,7 @@ class IpForwardingUtilsIfconfigTest(unittest.TestCase):
         mock.call.warning(mock.ANY, '1.1.1.1111'),
     ]
     self.assertEqual(self.mock_logger.mock_calls, expected_calls)
+    self.assertEqual(mock_netaddr.IPNetwork.mock_calls, [])
 
   @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.netaddr')
   def testParseForwardedIpsComplex(self, mock_netaddr):
@@ -332,21 +330,23 @@ class IpForwardingUtilsIfconfigTest(unittest.TestCase):
     self.assertEqual(self.mock_utils.ParseForwardedIps(input_ips), valid_ips)
     expected_calls = [mock.call.warning(mock.ANY, ip) for ip in invalid_ips]
     self.assertEqual(self.mock_logger.mock_calls, expected_calls)
+    expected_calls = [mock.call.IPNetwork(ip) for ip in valid_ips]
+    self.assertEqual(mock_netaddr.mock_calls, expected_calls)
 
   @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.netaddr')
   def testParseForwardedIpsSubnet(self, mock_netaddr):
-    def side_effect(arg):
-      return [arg]
-    mock_netaddr.IPNetwork.side_effect = side_effect
-    forwarded_ips = {
-        '1.1.1.1': '1.1.1.1',
-        '1.1.1.1/32': '1.1.1.1',
-        '1.1.1.1/1': '1.1.1.1/1',
-        '1.1.1.1/10': '1.1.1.1/10',
-        '1.1.1.1/24': '1.1.1.1/24',
-    }
-    for ip, value in forwarded_ips.items():
-      self.assertEqual(self.mock_utils.ParseForwardedIps([ip]), [value])
+    mock_netaddr.IPNetwork.return_value = ['1.1.1.1']
+    forwarded_ips = [
+        '1.1.1.1',
+        '1.1.1.1/32',
+        '1.1.1.1/1',
+        '1.1.1.1/10',
+        '1.1.1.1/24'
+    ]
+    for ip in forwarded_ips:
+      self.assertEqual(self.mock_utils.ParseForwardedIps([ip]), ['1.1.1.1'])
+    expected_calls = [mock.call.IPNetwork(ip) for ip in forwarded_ips]
+    self.assertEqual(mock_netaddr.mock_calls, expected_calls)
 
   @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.netifaces')
   @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.netaddr')
