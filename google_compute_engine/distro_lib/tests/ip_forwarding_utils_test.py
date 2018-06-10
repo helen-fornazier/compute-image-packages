@@ -230,5 +230,198 @@ class IpForwardingUtilsIprouteTest(unittest.TestCase):
         args=['delete', 'to', 'local', '1.1.1.1/24'], options=self.options)
 
 
+class IpForwardingUtilsIfconfigTest(unittest.TestCase):
+
+  def setUp(self):
+    self.mock_logger = mock.Mock()
+    with mock.patch(
+        'google_compute_engine.distro_lib.ip_forwarding_utils'
+        '.subprocess') as mock_subprocess:
+      mock_subprocess.Popen.return_value = _CreateMockProcess(
+          0, b'out', b'')
+      self.mock_utils = ip_forwarding_utils.IpForwardingUtilsIfconfig(
+          self.mock_logger)
+
+  @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.subprocess')
+  def testRunIfconfig(self, mock_subprocess):
+    mock_process = _CreateMockProcess(0, b'out', b'')
+    mock_subprocess.Popen.return_value = mock_process
+    args = ['foo', 'bar']
+    options = {'one': 'two'}
+
+    self.assertEqual(
+        self.mock_utils._RunIfconfig(args=args, options=options), 'out')
+    command = ['ifconfig', 'foo', 'bar', 'one', 'two']
+    mock_subprocess.Popen.assert_called_once_with(
+        command, stdout=mock_subprocess.PIPE, stderr=mock_subprocess.PIPE)
+    mock_process.communicate.assert_called_once_with()
+    self.mock_logger.warning.assert_not_called()
+
+  @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.subprocess')
+  def testRunIfconfigReturnCode(self, mock_subprocess):
+    mock_process = _CreateMockProcess(1, b'out', b'error\n')
+    mock_subprocess.Popen.return_value = mock_process
+
+    self.assertEqual(
+        self.mock_utils._RunIfconfig(args=['foo', 'bar']),
+        '')
+    command = ['ifconfig', 'foo', 'bar']
+    self.mock_logger.warning.assert_called_once_with(
+        mock.ANY, command, b'error')
+
+  @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.subprocess')
+  def testRunIfconfigException(self, mock_subprocess):
+    mock_subprocess.Popen.side_effect = OSError('Test Error')
+
+    self.assertEqual(
+        self.mock_utils._RunIfconfig(args=['foo', 'bar']),
+        '')
+    command = ['ifconfig', 'foo', 'bar']
+    self.mock_logger.warning.assert_called_once_with(
+        mock.ANY, command, 'Test Error')
+
+  @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.netaddr')
+  def testParseForwardedIps(self, mock_netaddr):
+    def side_effect(arg):
+      return [arg]
+    mock_netaddr.IPNetwork.side_effect = side_effect
+    self.assertEqual(self.mock_utils.ParseForwardedIps(None), [])
+    self.assertEqual(self.mock_utils.ParseForwardedIps([]), [])
+    self.assertEqual(self.mock_utils.ParseForwardedIps([None]), [])
+    self.assertEqual(self.mock_utils.ParseForwardedIps(['invalid']), [])
+    self.assertEqual(self.mock_utils.ParseForwardedIps(['1a1a1a1']), [])
+    self.assertEqual(self.mock_utils.ParseForwardedIps(['1.1.1.1.1']), [])
+    self.assertEqual(self.mock_utils.ParseForwardedIps(['1111.1.1.1']), [])
+    self.assertEqual(self.mock_utils.ParseForwardedIps(['1.1.1.1111']), [])
+    expected_calls = [
+        mock.call.warning(mock.ANY, None),
+        mock.call.warning(mock.ANY, 'invalid'),
+        mock.call.warning(mock.ANY, '1a1a1a1'),
+        mock.call.warning(mock.ANY, '1.1.1.1.1'),
+        mock.call.warning(mock.ANY, '1111.1.1.1'),
+        mock.call.warning(mock.ANY, '1.1.1.1111'),
+    ]
+    self.assertEqual(self.mock_logger.mock_calls, expected_calls)
+
+  @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.netaddr')
+  def testParseForwardedIpsComplex(self, mock_netaddr):
+    def side_effect(arg):
+      return [arg]
+    mock_netaddr.IPNetwork.side_effect = side_effect
+    forwarded_ips = {
+        '{{}}\n\"hello\"\n!@#$%^&*()\n\n': False,
+        '1111.1.1.1': False,
+        '1.1.1.1': True,
+        'hello': False,
+        '123.123.123.123': True,
+        '1.1.1.': False,
+        '1.1.1.a': False,
+        None: False,
+        '1.0.0.0': True,
+        '1.1.1.1/1': True,
+        '1.1.1.1/11': True,
+        '123.123.123.123/1': True,
+        '123.123.123.123/123': False,
+        '123.123.123.123/a': False,
+        '123.123.123.123/': False,
+    }
+    input_ips = forwarded_ips.keys()
+    valid_ips = [ip for ip, valid in forwarded_ips.items() if valid]
+    invalid_ips = [ip for ip, valid in forwarded_ips.items() if not valid]
+
+    self.assertEqual(self.mock_utils.ParseForwardedIps(input_ips), valid_ips)
+    expected_calls = [mock.call.warning(mock.ANY, ip) for ip in invalid_ips]
+    self.assertEqual(self.mock_logger.mock_calls, expected_calls)
+
+  @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.netaddr')
+  def testParseForwardedIpsSubnet(self, mock_netaddr):
+    def side_effect(arg):
+      return [arg]
+    mock_netaddr.IPNetwork.side_effect = side_effect
+    forwarded_ips = {
+        '1.1.1.1': '1.1.1.1',
+        '1.1.1.1/32': '1.1.1.1',
+        '1.1.1.1/1': '1.1.1.1/1',
+        '1.1.1.1/10': '1.1.1.1/10',
+        '1.1.1.1/24': '1.1.1.1/24',
+    }
+    for ip, value in forwarded_ips.items():
+      self.assertEqual(self.mock_utils.ParseForwardedIps([ip]), [value])
+
+  @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.netifaces')
+  @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.netaddr')
+  def testGetForwardedIps(self, mock_netaddr, mock_netifaces):
+    mock_netifaces.AF_INET = 0
+    mock_netifaces.ifaddresses.return_value = [[
+        {'addr': 'a', 'netmask': 'a mask'},
+        {'addr': 'b', 'netmask': 'b mask'},
+        {'addr': 'c', 'netmask': 'c mask'},
+    ]]
+    mock_netaddr.IPAddress().netmask_bits.return_value = 32
+    mock_parse = mock.Mock()
+    mock_parse.return_value = ['Test']
+    self.mock_utils.ParseForwardedIps = mock_parse
+
+    self.assertEqual(
+        self.mock_utils.GetForwardedIps('interface', 'ip'), ['Test'])
+    mock_netifaces.ifaddresses.assert_called_once_with('interface')
+    mock_parse.assert_called_once_with(['a/32', 'b/32', 'c/32'])
+
+  @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.netaddr')
+  def testAddForwardedIp(self, mock_netaddr):
+    mock_netaddr.IPNetwork.return_value = ['1.1.1.1']
+    mock_run = mock.Mock()
+    self.mock_utils._RunIfconfig = mock_run
+
+    self.mock_utils.AddForwardedIp('1.1.1.1', 'interface')
+    mock_netaddr.IPNetwork.assert_called_once_with('1.1.1.1/32')
+    mock_run.assert_called_once_with(
+        args=['interface', 'alias', '1.1.1.1/32'])
+
+  @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.netaddr')
+  def testAddIpAlias(self, mock_netaddr):
+    mock_netaddr.IPNetwork.return_value = [
+       '1.1.1.0', '1.1.1.1', '1.1.1.2', '1.1.1.3'
+    ]
+    mock_run = mock.Mock()
+    self.mock_utils._RunIfconfig = mock_run
+
+    self.mock_utils.AddForwardedIp('1.1.1.1/30', 'interface')
+    mock_netaddr.IPNetwork.assert_called_once_with('1.1.1.1/30')
+    expected_calls = [
+        mock.call(args=['interface', 'alias', '1.1.1.0/32']),
+        mock.call(args=['interface', 'alias', '1.1.1.1/32']),
+        mock.call(args=['interface', 'alias', '1.1.1.2/32']),
+        mock.call(args=['interface', 'alias', '1.1.1.3/32'])
+    ]
+    self.assertEqual(mock_run.mock_calls, expected_calls)
+
+  @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.netaddr')
+  def testRemoveForwardedIp(self, mock_netaddr):
+    mock_ip = mock.Mock()
+    mock_ip.ip = '1.1.1.1'
+    mock_netaddr.IPNetwork.return_value = mock_ip
+    mock_run = mock.Mock()
+    self.mock_utils._RunIfconfig = mock_run
+
+    self.mock_utils.RemoveForwardedIp('1.1.1.1', 'interface')
+    mock_netaddr.IPNetwork.assert_called_once_with('1.1.1.1/32')
+    mock_run.assert_called_once_with(
+        args=['interface', '-alias', '1.1.1.1'])
+
+  @mock.patch('google_compute_engine.distro_lib.ip_forwarding_utils.netaddr')
+  def testRemoveAliasIp(self, mock_netaddr):
+    mock_ip = mock.Mock()
+    mock_ip.ip = '1.1.1.1'
+    mock_netaddr.IPNetwork.return_value = mock_ip
+    mock_run = mock.Mock()
+    self.mock_utils._RunIfconfig = mock_run
+
+    self.mock_utils.RemoveForwardedIp('1.1.1.1/24', 'interface')
+    mock_netaddr.IPNetwork.assert_called_once_with('1.1.1.1/24')
+    mock_run.assert_called_once_with(
+        args=['interface', '-alias', '1.1.1.1'])
+
+
 if __name__ == '__main__':
   unittest.main()
