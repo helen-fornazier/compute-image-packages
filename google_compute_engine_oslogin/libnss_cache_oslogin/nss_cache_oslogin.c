@@ -33,7 +33,7 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 static FILE *p_file = NULL;
 static char p_filename[NSS_CACHE_OSLOGIN_PATH_LENGTH] =
-    "/etc/oslogin_passwd.cache";
+    "/usr/local/etc/oslogin_passwd.cache";
 #ifdef BSD
 extern int fgetpwent_r(FILE *, struct passwd *, char *, size_t,
                        struct passwd **);
